@@ -118,17 +118,49 @@ contract Deploy is Script {
                     )
                 )
             );
-                // 8. LendingPool (UUPS) — same pattern
+        
+        // 8. LendingPool (UUPS)
 
-                // 9. Transfer ARLY supply to Timelock treasury
-                arly.transfer(address(timelock), arly.balanceOf(deployer));
+        LendingPool lendingImpl =
+            new LendingPool();
 
-                vm.stopBroadcast();
+        bytes memory lendingInit =
+            abi.encodeCall(
+                LendingPool.initialize,
+                (
+                    IERC20(
+                        address(arly)
+                    ),
+                    IERC20(
+                        address(arly)
+                    ),
+                    oracle,
+                    address(
+                        timelock
+                    )
+                )
+            );
 
-                _logAddresses();
-            }
+        lendingPool =
+            LendingPool(
+                address(
+                    new ERC1967Proxy(
+                        address(
+                            lendingImpl
+                        ),
+                        lendingInit
+                    )
+                )
+            );
+        // 9. Transfer ARLY supply to Timelock treasury
+        arly.transfer(address(timelock), arly.balanceOf(deployer));
 
-            function _logAddresses() internal view {
-                // TODO: write addresses to deployments/<chainid>.json for the frontend
-            }
+            vm.stopBroadcast();
+
+            _logAddresses();
+        }
+
+        function _logAddresses() internal view {
+               // TODO: write addresses to deployments/<chainid>.json for the frontend
+           }
 }
