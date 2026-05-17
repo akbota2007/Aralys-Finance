@@ -110,6 +110,39 @@ contract YieldVault is
         _unpause();
     }
 
-    // TODO Zaure: override `_deposit` and `_withdraw` to add `nonReentrant` and `whenNotPaused` modifiers
-    //             via a wrapper; add fee-accrual logic.
+    // --
+    function deposit(
+        uint256 assets,
+        address receiver
+    )
+        public
+        override
+        nonReentrant
+        whenNotPaused
+        returns (uint256)
+    {
+        return super.deposit(
+            assets,
+            receiver
+        );
+    }
+
+
+    function withdraw(
+        uint256 assets,
+        address receiver,
+        address owner
+    )
+        public
+        override
+        nonReentrant
+        whenNotPaused
+        returns (uint256)
+    {
+        return super.withdraw(
+            assets,
+            receiver,
+            owner
+        );
+    }
 }
