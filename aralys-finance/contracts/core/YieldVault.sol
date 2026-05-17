@@ -46,7 +46,13 @@ contract YieldVault is
 
     // keccak256(abi.encode(uint256(keccak256("aralys.storage.YieldVault")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant VAULT_STORAGE_LOCATION =
-        0x0000000000000000000000000000000000000000000000000000000000000000; // TODO Zaure: compute
+        bytes32(
+            uint256(
+                keccak256(
+                    "aralys.storage.YieldVault"
+                )
+            )
+        );
 
     function _getVaultStorage() private pure returns (VaultStorage storage $) {
         bytes32 slot = VAULT_STORAGE_LOCATION;
@@ -111,7 +117,6 @@ contract YieldVault is
         _unpause();
     }
 
-    // --
     function deposit(
         uint256 assets,
         address receiver
@@ -170,6 +175,13 @@ contract YieldVault is
 
         feeShares =
             previewDeposit(feeAssets);
+
+        if (feeShares == 0) {
+            return (
+                feeAssets,
+                0
+            );
+        }
 
         _mint(
             $.feeRecipient,
