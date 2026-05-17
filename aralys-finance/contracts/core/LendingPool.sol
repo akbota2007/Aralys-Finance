@@ -212,7 +212,9 @@ contract LendingPool is
 
         Position storage position =
             positions[msg.sender];
-
+        _accrueInterest(
+            msg.sender
+        );
         // EFFECTS
         position.debt += amount;
         totalBorrowed += amount;
@@ -251,7 +253,9 @@ contract LendingPool is
             amount =
                 position.debt;
         }
-
+        _accrueInterest(
+            msg.sender
+        );
         // EFFECTS
         position.debt -= amount;
         totalBorrowed -= amount;
@@ -319,21 +323,40 @@ contract LendingPool is
             debtToRepay
         );
     }
-    // -- core actions --
-    // TODO Team Lead:
-    //   [ ] deposit(amount)   — pull collateralToken with SafeERC20, update Position, emit
-    //   [ ] withdraw(amount)  — check HF stays ≥ 1 after withdrawal, push collateralToken
-    //   [ ] borrow(amount)    — accrue interest, check HF, transfer debtToken
-    //   [ ] repay(amount)     — accrue interest, reduce debt, pull debtToken
-    //   [ ] liquidate(user)   — assert HF < 1, seize (collateral * (1+bonus)), repay debt
-    //   [ ] healthFactor(user) view — = (collateral * price * LIQ_THRESHOLD) / debt, scaled 1e18
-    //   [ ] _accrueInterest(user) internal — linear: debt += debt * rate * dt
-    //
-    // ALL must use:
-    //   - nonReentrant
-    //   - whenNotPaused
-    //   - SafeERC20
-    //   - Checks-Effects-Interactions
+
+    function _accrueInterest(
+        address user
+    )
+        internal
+    {
+        Position storage position =
+            positions[user];
+
+        if (
+            position.debt == 0
+        ) {
+            position.lastAccrued =
+                block.timestamp;
+            return;
+        }
+
+        uint256 dt =
+            block.timestamp -
+            position.lastAccrued;
+
+        uint256 interest =
+            (
+                position.debt *
+                interestRatePerSecond *
+                dt
+            ) / WAD;
+
+        position.debt +=
+            interest;
+
+        position.lastAccrued =
+            block.timestamp;
+    }
     //   - oracle.getPrice() with staleness handled by adapter
     
 }
