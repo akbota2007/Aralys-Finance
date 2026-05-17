@@ -2,8 +2,7 @@
 pragma solidity 0.8.24;
 
 import { OwnableUpgradeable } from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from
-    "@openzeppelin-upgradeable/contracts/utils/ReentrancyGuardUpgradeable.sol";
+import { ReentrancyGuardTransient } from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import { PausableUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/PausableUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -33,7 +32,7 @@ import { OracleAdapter } from "../oracles/OracleAdapter.sol";
 contract LendingPool is
     Initializable,
     OwnableUpgradeable,
-    ReentrancyGuardUpgradeable,
+    ReentrancyGuardTransient,
     PausableUpgradeable,
     UUPSUpgradeable
 {
@@ -84,9 +83,7 @@ contract LendingPool is
         address owner_
     ) external initializer {
         __Ownable_init(owner_);
-        __ReentrancyGuard_init();
         __Pausable_init();
-        __UUPSUpgradeable_init();
 
         collateralToken = collateralToken_;
         debtToken = debtToken_;
@@ -107,6 +104,34 @@ contract LendingPool is
         _unpause();
     }
 
+    function deposit(uint256 amount)
+        external
+        nonReentrant
+        whenNotPaused
+    {
+        // CHECKS
+        if (amount == 0) revert ZeroAmount();
+
+        Position storage position =
+            positions[msg.sender];
+
+        // EFFECTS
+        position.collateral += amount;
+        totalDeposited += amount;
+
+        // INTERACTIONS
+        collateralToken.safeTransferFrom(
+            msg.sender,
+            address(this),
+            amount
+        );
+
+        emit Deposit(
+            msg.sender,
+            amount
+        );
+    }
+
     // -- core actions --
     // TODO Team Lead:
     //   [ ] deposit(amount)   — pull collateralToken with SafeERC20, update Position, emit
@@ -123,4 +148,5 @@ contract LendingPool is
     //   - SafeERC20
     //   - Checks-Effects-Interactions
     //   - oracle.getPrice() with staleness handled by adapter
+    
 }
