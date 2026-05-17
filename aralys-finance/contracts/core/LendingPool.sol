@@ -236,6 +236,89 @@ contract LendingPool is
             amount
         );
     }
+
+    function repay(uint256 amount)
+        external
+        nonReentrant
+        whenNotPaused
+    {
+        if (amount == 0) revert ZeroAmount();
+
+        Position storage position =
+            positions[msg.sender];
+
+        if (position.debt < amount) {
+            amount =
+                position.debt;
+        }
+
+        // EFFECTS
+        position.debt -= amount;
+        totalBorrowed -= amount;
+
+        // INTERACTIONS
+        debtToken.safeTransferFrom(
+            msg.sender,
+            address(this),
+            amount
+        );
+
+        emit Repay(
+            msg.sender,
+            amount
+        );
+    }
+
+    function liquidate(address user)
+        external
+        nonReentrant
+        whenNotPaused
+    {
+        if (
+            healthFactor(user)
+                >= WAD
+        ) {
+            revert Healthy();
+        }
+
+        Position storage position =
+            positions[user];
+
+        uint256 debtToRepay =
+            position.debt;
+
+        uint256 collateralToSeize =
+            (
+                position.collateral *
+                (BPS + LIQ_BONUS_BPS)
+            ) / BPS;
+
+        // EFFECTS
+        totalBorrowed -= debtToRepay;
+        totalDeposited -=
+            position.collateral;
+
+        delete positions[user];
+
+        // INTERACTIONS
+        debtToken.safeTransferFrom(
+            msg.sender,
+            address(this),
+            debtToRepay
+        );
+
+        collateralToken.safeTransfer(
+            msg.sender,
+            collateralToSeize
+        );
+
+        emit Liquidate(
+            msg.sender,
+            user,
+            collateralToSeize,
+            debtToRepay
+        );
+    }
     // -- core actions --
     // TODO Team Lead:
     //   [ ] deposit(amount)   — pull collateralToken with SafeERC20, update Position, emit
