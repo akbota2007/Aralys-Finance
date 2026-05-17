@@ -30,6 +30,7 @@ contract AMMPair is ERC20, ReentrancyGuard {
 
     error AlreadyInitialized();
     error OnlyFactory();
+    error InvalidToken();
     error InsufficientLiquidityMinted();
     error InsufficientLiquidityBurned();
     error InsufficientOutputAmount();
@@ -37,6 +38,7 @@ contract AMMPair is ERC20, ReentrancyGuard {
     error InsufficientLiquidity();
     error KInvariantViolated();
     error InvalidTo();
+    
 
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);
     event Burn(address indexed sender, uint256 amount0, uint256 amount1, address indexed to);
@@ -61,6 +63,13 @@ contract AMMPair is ERC20, ReentrancyGuard {
             factory = msg.sender;
         } else if (msg.sender != factory) {
             revert OnlyFactory();
+        }
+
+        if (
+            _token0 == address(0) ||
+            _token1 == address(0)
+        ) {
+            revert InvalidToken();
         }
 
         token0 = _token0;
@@ -123,7 +132,6 @@ contract AMMPair is ERC20, ReentrancyGuard {
         nonReentrant
         returns (uint256 amount0, uint256 amount1)
     {
-        (uint112 reserve0, uint112 reserve1,) = getReserves();
 
         address _token0 = token0;
         address _token1 = token1;
