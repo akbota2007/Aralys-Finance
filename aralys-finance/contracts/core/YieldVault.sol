@@ -59,6 +59,7 @@ contract YieldVault is
 
     event FeeRecipientChanged(address indexed newRecipient);
     event PerformanceFeeChanged(uint96 newBps);
+    event PerformanceFeeCollected(address indexed recipient, uint256 assets, uint256 shares);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -143,6 +144,42 @@ contract YieldVault is
             assets,
             receiver,
             owner
+        );
+    }
+
+    function collectPerformanceFee(uint256 profitAssets)
+        external
+        onlyOwner
+        nonReentrant
+        whenNotPaused
+        returns (uint256 feeAssets, uint256 feeShares)
+    {
+        if (profitAssets == 0) {
+            return (0, 0);
+        }
+
+        VaultStorage storage $ =
+            _getVaultStorage();
+
+        feeAssets =
+            (profitAssets * $.performanceFeeBps) / 10_000;
+
+        if (feeAssets == 0) {
+            return (0, 0);
+        }
+
+        feeShares =
+            previewDeposit(feeAssets);
+
+        _mint(
+            $.feeRecipient,
+            feeShares
+        );
+
+        emit PerformanceFeeCollected(
+            $.feeRecipient,
+            feeAssets,
+            feeShares
         );
     }
 }
