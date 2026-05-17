@@ -11,11 +11,11 @@
 
 | Member       | Domain                                                      | Primary contracts / files |
 | ------------ | ----------------------------------------------------------- | ------------------------- |
-| **<NAME 1>** | Governance, L2 deployment, DevOps                           | `governance/*`, `script/*`, `.github/workflows/*` |
+| **Akbota** | Governance, L2 deployment, DevOps                           | `governance/*`, `script/*`, `.github/workflows/*` |
 | **Zaure**    | Core DeFi primitives (AMM, ERC-4626 vault, Yul opt.)        | `core/AMMPair.sol`, `core/AMMFactory.sol`, `core/YieldVault.sol`, `libraries/MathYul.sol` |
 | **Ayauzhan** | Tokens, Oracles, Frontend, Subgraph                         | `tokens/*`, `oracles/*`, `frontend/*`, `subgraph/*` |
 
-> Replace `<NAME 1>` with the team lead's name. Ownership is locked from end of W6 — see `docs/architecture.md` §Trust Assumptions.
+
 
 ---
 
@@ -111,7 +111,7 @@ pnpm deploy  # to Graph Studio
 
 | Contract            | Address                      | Verified |
 | ------------------- | ---------------------------- | -------- |
-| ARLY token          | `0x...` *(fill after deploy)*| ✅       |
+| ARLY token          | `0x...`                      | ✅       |
 | Timelock            | `0x...`                      | ✅       |
 | Governor            | `0x...`                      | ✅       |
 | AMM Factory         | `0x...`                      | ✅       |
