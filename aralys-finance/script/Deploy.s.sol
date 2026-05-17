@@ -86,17 +86,81 @@ contract Deploy is Script {
         ammFactory = new AMMFactory(address(timelock));
 
         // 7. YieldVault (UUPS) — TODO: deploy implementation, then ERC1967 proxy, then initialize
-        // 8. LendingPool (UUPS) — same pattern
+        // 7. YieldVault (UUPS)
 
+        YieldVault vaultImpl =
+            new YieldVault();
+
+        bytes memory vaultInit =
+            abi.encodeCall(
+                YieldVault.initialize,
+                (
+                    IERC20(
+                        address(arly)
+                    ),
+                    address(
+                        timelock
+                    ),
+                    address(
+                        timelock
+                    )
+                )
+            );
+
+        yieldVault =
+            YieldVault(
+                address(
+                    new ERC1967Proxy(
+                        address(
+                            vaultImpl
+                        ),
+                        vaultInit
+                    )
+                )
+            );
+        
+        // 8. LendingPool (UUPS)
+
+        LendingPool lendingImpl =
+            new LendingPool();
+
+        bytes memory lendingInit =
+            abi.encodeCall(
+                LendingPool.initialize,
+                (
+                    IERC20(
+                        address(arly)
+                    ),
+                    IERC20(
+                        address(arly)
+                    ),
+                    oracle,
+                    address(
+                        timelock
+                    )
+                )
+            );
+
+        lendingPool =
+            LendingPool(
+                address(
+                    new ERC1967Proxy(
+                        address(
+                            lendingImpl
+                        ),
+                        lendingInit
+                    )
+                )
+            );
         // 9. Transfer ARLY supply to Timelock treasury
         arly.transfer(address(timelock), arly.balanceOf(deployer));
 
-        vm.stopBroadcast();
+            vm.stopBroadcast();
 
-        _logAddresses();
-    }
+            _logAddresses();
+        }
 
-    function _logAddresses() internal view {
-        // TODO: write addresses to deployments/<chainid>.json for the frontend
-    }
+        function _logAddresses() internal view {
+               // TODO: write addresses to deployments/<chainid>.json for the frontend
+           }
 }
