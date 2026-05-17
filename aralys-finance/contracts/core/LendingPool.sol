@@ -165,6 +165,44 @@ contract LendingPool is
             ) / position.debt;
     }
 
+    function withdraw(uint256 amount)
+        external
+        nonReentrant
+        whenNotPaused
+    {
+        if (amount == 0) revert ZeroAmount();
+
+        Position storage position =
+            positions[msg.sender];
+
+        if (position.collateral < amount) {
+            revert InsufficientCollateral();
+        }
+
+        // EFFECTS
+        position.collateral -= amount;
+        totalDeposited -= amount;
+
+        // HEALTH CHECK
+        if (
+            healthFactor(msg.sender)
+                < WAD
+        ) {
+            revert Unhealthy();
+        }
+
+        // INTERACTIONS
+        collateralToken.safeTransfer(
+            msg.sender,
+            amount
+        );
+
+        emit Withdraw(
+            msg.sender,
+            amount
+        );
+    }
+
     // -- core actions --
     // TODO Team Lead:
     //   [ ] deposit(amount)   — pull collateralToken with SafeERC20, update Position, emit
