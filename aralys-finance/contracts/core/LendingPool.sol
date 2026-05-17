@@ -203,6 +203,39 @@ contract LendingPool is
         );
     }
 
+    function borrow(uint256 amount)
+        external
+        nonReentrant
+        whenNotPaused
+    {
+        if (amount == 0) revert ZeroAmount();
+
+        Position storage position =
+            positions[msg.sender];
+
+        // EFFECTS
+        position.debt += amount;
+        totalBorrowed += amount;
+
+        // HEALTH CHECK
+        if (
+            healthFactor(msg.sender)
+                < WAD
+        ) {
+            revert Unhealthy();
+        }
+
+        // INTERACTIONS
+        debtToken.safeTransfer(
+            msg.sender,
+            amount
+        );
+
+        emit Borrow(
+            msg.sender,
+            amount
+        );
+    }
     // -- core actions --
     // TODO Team Lead:
     //   [ ] deposit(amount)   — pull collateralToken with SafeERC20, update Position, emit
