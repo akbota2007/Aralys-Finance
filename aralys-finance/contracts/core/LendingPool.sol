@@ -132,6 +132,39 @@ contract LendingPool is
         );
     }
 
+    function healthFactor(address user)
+        public
+        view
+        returns (uint256)
+    {
+        Position memory position =
+            positions[user];
+
+        if (position.debt == 0) {
+            return type(uint256).max;
+        }
+
+        uint256 price =
+            oracle.getPrice(
+                address(
+                    collateralToken
+                )
+            );
+
+        uint256 collateralValue =
+            (
+                position.collateral *
+                price *
+                LIQ_THRESHOLD_BPS
+            ) / BPS;
+
+        return
+            (
+                collateralValue *
+                WAD
+            ) / position.debt;
+    }
+
     // -- core actions --
     // TODO Team Lead:
     //   [ ] deposit(amount)   — pull collateralToken with SafeERC20, update Position, emit
