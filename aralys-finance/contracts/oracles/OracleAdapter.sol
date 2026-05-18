@@ -2,8 +2,8 @@
 pragma solidity 0.8.24;
 
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
-import { AggregatorV3Interface } from "@chainlink/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-
+import { AggregatorV3Interface } from
+    "../interfaces/AggregatorV3Interface.sol";
 /**
  * @title OracleAdapter
  * @notice Wraps Chainlink AggregatorV3 with staleness, zero, and round-completion checks.

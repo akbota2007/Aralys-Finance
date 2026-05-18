@@ -4,8 +4,8 @@ pragma solidity 0.8.24;
 import { ERC4626Upgradeable } from
     "@openzeppelin-upgradeable/contracts/token/ERC20/extensions/ERC4626Upgradeable.sol";
 import { OwnableUpgradeable } from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from
-    "@openzeppelin-upgradeable/contracts/utils/ReentrancyGuardUpgradeable.sol";
+import { ReentrancyGuardTransient } from
+    "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import { PausableUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/PausableUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -34,7 +34,7 @@ contract YieldVault is
     Initializable,
     ERC4626Upgradeable,
     OwnableUpgradeable,
-    ReentrancyGuardUpgradeable,
+    ReentrancyGuardTransient,
     PausableUpgradeable,
     UUPSUpgradeable
 {
@@ -46,7 +46,13 @@ contract YieldVault is
 
     // keccak256(abi.encode(uint256(keccak256("aralys.storage.YieldVault")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant VAULT_STORAGE_LOCATION =
-        0x0000000000000000000000000000000000000000000000000000000000000000; // TODO Zaure: compute
+        bytes32(
+            uint256(
+                keccak256(
+                    "aralys.storage.YieldVault"
+                )
+            )
+        );
 
     function _getVaultStorage() private pure returns (VaultStorage storage $) {
         bytes32 slot = VAULT_STORAGE_LOCATION;
@@ -59,6 +65,7 @@ contract YieldVault is
 
     event FeeRecipientChanged(address indexed newRecipient);
     event PerformanceFeeChanged(uint96 newBps);
+    event PerformanceFeeCollected(address indexed recipient, uint256 assets, uint256 shares);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -69,9 +76,7 @@ contract YieldVault is
         __ERC20_init("Aralys Yield Vault", "yARLY");
         __ERC4626_init(asset_);
         __Ownable_init(owner_);
-        __ReentrancyGuard_init();
         __Pausable_init();
-        __UUPSUpgradeable_init();
 
         VaultStorage storage $ = _getVaultStorage();
         $.feeRecipient = feeRecipient_;
@@ -112,6 +117,81 @@ contract YieldVault is
         _unpause();
     }
 
-    // TODO Zaure: override `_deposit` and `_withdraw` to add `nonReentrant` and `whenNotPaused` modifiers
-    //             via a wrapper; add fee-accrual logic.
+    function deposit(
+        uint256 assets,
+        address receiver
+    )
+        public
+        override
+        nonReentrant
+        whenNotPaused
+        returns (uint256)
+    {
+        return super.deposit(
+            assets,
+            receiver
+        );
+    }
+
+
+    function withdraw(
+        uint256 assets,
+        address receiver,
+        address owner
+    )
+        public
+        override
+        nonReentrant
+        whenNotPaused
+        returns (uint256)
+    {
+        return super.withdraw(
+            assets,
+            receiver,
+            owner
+        );
+    }
+
+    function collectPerformanceFee(uint256 profitAssets)
+        external
+        onlyOwner
+        nonReentrant
+        whenNotPaused
+        returns (uint256 feeAssets, uint256 feeShares)
+    {
+        if (profitAssets == 0) {
+            return (0, 0);
+        }
+
+        VaultStorage storage $ =
+            _getVaultStorage();
+
+        feeAssets =
+            (profitAssets * $.performanceFeeBps) / 10_000;
+
+        if (feeAssets == 0) {
+            return (0, 0);
+        }
+
+        feeShares =
+            previewDeposit(feeAssets);
+
+        if (feeShares == 0) {
+            return (
+                feeAssets,
+                0
+            );
+        }
+
+        _mint(
+            $.feeRecipient,
+            feeShares
+        );
+
+        emit PerformanceFeeCollected(
+            $.feeRecipient,
+            feeAssets,
+            feeShares
+        );
+    }
 }
