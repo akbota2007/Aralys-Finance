@@ -2,7 +2,8 @@
 pragma solidity 0.8.24;
 
 import { OwnableUpgradeable } from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import { ReentrancyGuardTransient } from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
+import { ReentrancyGuardUpgradeable } from
+    "../libraries/ReentrancyGuardUpgradeable.sol";
 import { PausableUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/PausableUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -13,7 +14,7 @@ import { OracleAdapter } from "../oracles/OracleAdapter.sol";
 contract LendingPool is
     Initializable,
     OwnableUpgradeable,
-    ReentrancyGuardTransient,
+    ReentrancyGuardUpgradeable,
     PausableUpgradeable,
     UUPSUpgradeable
 {
@@ -74,7 +75,9 @@ contract LendingPool is
         address owner_
     ) external initializer {
         __Ownable_init(owner_);
+        __ReentrancyGuard_init();
         __Pausable_init();
+        
 
         collateralToken = collateralToken_;
         debtToken = debtToken_;
@@ -122,264 +125,6 @@ contract LendingPool is
         emit Withdrawn(msg.sender, amount);
     }
 
-<<<<<<< HEAD
-    function deposit(uint256 amount)
-        external
-        nonReentrant
-        whenNotPaused
-    {
-        // CHECKS
-        if (amount == 0) revert ZeroAmount();
-
-        Position storage position =
-            positions[msg.sender];
-
-        // EFFECTS
-        position.collateral += amount;
-        totalDeposited += amount;
-
-        // INTERACTIONS
-        collateralToken.safeTransferFrom(
-            msg.sender,
-            address(this),
-            amount
-        );
-
-        emit Deposit(
-            msg.sender,
-            amount
-        );
-    }
-
-    function healthFactor(address user)
-        public
-        view
-        returns (uint256)
-    {
-        Position memory position =
-            positions[user];
-
-        if (position.debt == 0) {
-            return type(uint256).max;
-        }
-
-        uint256 price =
-            oracle.getPrice(
-                address(
-                    collateralToken
-                )
-            );
-
-        uint256 collateralValue =
-            (
-                position.collateral *
-                price *
-                LIQ_THRESHOLD_BPS
-            ) / BPS;
-
-        return
-            (
-                collateralValue *
-                WAD
-            ) / position.debt;
-    }
-
-    function withdraw(uint256 amount)
-        external
-        nonReentrant
-        whenNotPaused
-    {
-        if (amount == 0) revert ZeroAmount();
-
-        Position storage position =
-            positions[msg.sender];
-
-        if (position.collateral < amount) {
-            revert InsufficientCollateral();
-        }
-
-        // EFFECTS
-        position.collateral -= amount;
-        totalDeposited -= amount;
-
-        // HEALTH CHECK
-        if (
-            healthFactor(msg.sender)
-                < WAD
-        ) {
-            revert Unhealthy();
-        }
-
-        // INTERACTIONS
-        collateralToken.safeTransfer(
-            msg.sender,
-            amount
-        );
-
-        emit Withdraw(
-            msg.sender,
-            amount
-        );
-    }
-
-    function borrow(uint256 amount)
-        external
-        nonReentrant
-        whenNotPaused
-    {
-        if (amount == 0) revert ZeroAmount();
-
-        Position storage position =
-            positions[msg.sender];
-        _accrueInterest(
-            msg.sender
-        );
-        // EFFECTS
-        position.debt += amount;
-        totalBorrowed += amount;
-
-        // HEALTH CHECK
-        if (
-            healthFactor(msg.sender)
-                < WAD
-        ) {
-            revert Unhealthy();
-        }
-
-        // INTERACTIONS
-        debtToken.safeTransfer(
-            msg.sender,
-            amount
-        );
-
-        emit Borrow(
-            msg.sender,
-            amount
-        );
-    }
-
-    function repay(uint256 amount)
-        external
-        nonReentrant
-        whenNotPaused
-    {
-        if (amount == 0) revert ZeroAmount();
-
-        Position storage position =
-            positions[msg.sender];
-
-        if (position.debt < amount) {
-            amount =
-                position.debt;
-        }
-        _accrueInterest(
-            msg.sender
-        );
-        // EFFECTS
-        position.debt -= amount;
-        totalBorrowed -= amount;
-
-        // INTERACTIONS
-        debtToken.safeTransferFrom(
-            msg.sender,
-            address(this),
-            amount
-        );
-
-        emit Repay(
-            msg.sender,
-            amount
-        );
-    }
-
-    function liquidate(address user)
-        external
-        nonReentrant
-        whenNotPaused
-    {
-        if (
-            healthFactor(user)
-                >= WAD
-        ) {
-            revert Healthy();
-        }
-
-        Position storage position =
-            positions[user];
-
-        uint256 debtToRepay =
-            position.debt;
-
-        uint256 collateralToSeize =
-            (
-                position.collateral *
-                (BPS + LIQ_BONUS_BPS)
-            ) / BPS;
-
-        // EFFECTS
-        totalBorrowed -= debtToRepay;
-        totalDeposited -=
-            position.collateral;
-
-        delete positions[user];
-
-        // INTERACTIONS
-        debtToken.safeTransferFrom(
-            msg.sender,
-            address(this),
-            debtToRepay
-        );
-
-        collateralToken.safeTransfer(
-            msg.sender,
-            collateralToSeize
-        );
-
-        emit Liquidate(
-            msg.sender,
-            user,
-            collateralToSeize,
-            debtToRepay
-        );
-    }
-
-    function _accrueInterest(
-        address user
-    )
-        internal
-    {
-        Position storage position =
-            positions[user];
-
-        if (
-            position.debt == 0
-        ) {
-            position.lastAccrued =
-                block.timestamp;
-            return;
-        }
-
-        uint256 dt =
-            block.timestamp -
-            position.lastAccrued;
-
-        uint256 interest =
-            (
-                position.debt *
-                interestRatePerSecond *
-                dt
-            ) / WAD;
-
-        position.debt +=
-            interest;
-
-        position.lastAccrued =
-            block.timestamp;
-    }
-    //   - oracle.getPrice() with staleness handled by adapter
-    
-}
-=======
     function borrow(uint256 amount) external nonReentrant whenNotPaused {
         if (amount == 0) revert ZeroAmount();
 
@@ -469,7 +214,10 @@ contract LendingPool is
 
         uint256 price = oracle.getPrice(collateralAsset);
         uint256 collateralValue = (uint256(pos.collateral) * price * LIQ_THRESHOLD_BPS) / BPS;
-        return (collateralValue * WAD) / (uint256(pos.debt) * price);
+        uint256 debtValue = uint256(pos.debt) * WAD;
+        return collateralValue / (debtValue / WAD);
     }
 }
->>>>>>> b1f3645 (Add LendingPool implementation and unit tests)
+
+
+
