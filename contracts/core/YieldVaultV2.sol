@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.24;
+
+import { YieldVault } from "./YieldVault.sol";
+
+/**
+ * @title YieldVaultV2
+ * @notice V2 upgrade of YieldVault. Adds harvestFee() function and version().
+ * @dev    Demonstrates UUPS V1 -> V2 upgrade path required by spec.
+ *         Storage layout is identical to V1 — no new slots added outside __gap.
+ *         OWNERSHIP: Zaure
+ */
+contract YieldVaultV2 is YieldVault {
+
+    /// @notice New in V2: returns protocol version string.
+    function version() external pure returns (string memory) {
+        return "2.0.0";
+    }
+
+    /// @notice New in V2: harvests accumulated performance fee to feeRecipient.
+    function harvestFee() external {
+        address recipient = this.feeRecipient();
+        uint256 assets = totalAssets();
+        uint256 shares = balanceOf(address(this));
+        if (shares > 0) {
+            redeem(shares, recipient, address(this));
+        }
+    }
+}
