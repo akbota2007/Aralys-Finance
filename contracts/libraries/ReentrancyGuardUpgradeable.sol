@@ -3,10 +3,21 @@ pragma solidity 0.8.24;
 
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
 
+<<<<<<< HEAD:contracts/libraries/ReentrancyGuardUpgradeable.sol
+=======
+/**
+ * @dev Reentrancy guard for upgradeable contracts.
+ *      OZ v5 removed ReentrancyGuardUpgradeable — this is a minimal replacement.
+ */
+>>>>>>> 59d5972 (test(vault): add YieldVaultV2 upgrade tests, fix V2 constructor):aralys-finance/contracts/libraries/ReentrancyGuardUpgradeable.sol
 abstract contract ReentrancyGuardUpgradeable is Initializable {
     uint256 private constant NOT_ENTERED = 1;
     uint256 private constant ENTERED = 2;
 
+<<<<<<< HEAD:contracts/libraries/ReentrancyGuardUpgradeable.sol
+=======
+    /// @custom:storage-location erc7201:aralys.storage.ReentrancyGuard
+>>>>>>> 59d5972 (test(vault): add YieldVaultV2 upgrade tests, fix V2 constructor):aralys-finance/contracts/libraries/ReentrancyGuardUpgradeable.sol
     struct ReentrancyGuardStorage {
         uint256 status;
     }
@@ -32,4 +43,8 @@ abstract contract ReentrancyGuardUpgradeable is Initializable {
         _;
         $.status = NOT_ENTERED;
     }
+<<<<<<< HEAD:contracts/libraries/ReentrancyGuardUpgradeable.sol
 }
+=======
+}
+>>>>>>> 59d5972 (test(vault): add YieldVaultV2 upgrade tests, fix V2 constructor):aralys-finance/contracts/libraries/ReentrancyGuardUpgradeable.sol

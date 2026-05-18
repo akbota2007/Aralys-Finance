@@ -3,6 +3,10 @@ pragma solidity 0.8.24;
 
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 import { AggregatorV3Interface } from "../interfaces/AggregatorV3Interface.sol";
+<<<<<<< HEAD:contracts/oracles/OracleAdapter.sol
+=======
+
+>>>>>>> 59d5972 (test(vault): add YieldVaultV2 upgrade tests, fix V2 constructor):aralys-finance/contracts/oracles/OracleAdapter.sol
 
 /**
  * @title OracleAdapter

@@ -2,8 +2,12 @@
 pragma solidity 0.8.24;
 
 import { OwnableUpgradeable } from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
+<<<<<<< HEAD:contracts/core/LendingPool.sol
 import { ReentrancyGuardUpgradeable } from
     "../libraries/ReentrancyGuardUpgradeable.sol";
+=======
+import { ReentrancyGuardUpgradeable } from "../libraries/ReentrancyGuardUpgradeable.sol";
+>>>>>>> 59d5972 (test(vault): add YieldVaultV2 upgrade tests, fix V2 constructor):aralys-finance/contracts/core/LendingPool.sol
 import { PausableUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/PausableUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -77,7 +81,10 @@ contract LendingPool is
         __Ownable_init(owner_);
         __ReentrancyGuard_init();
         __Pausable_init();
+<<<<<<< HEAD:contracts/core/LendingPool.sol
         
+=======
+>>>>>>> 59d5972 (test(vault): add YieldVaultV2 upgrade tests, fix V2 constructor):aralys-finance/contracts/core/LendingPool.sol
 
         collateralToken = collateralToken_;
         debtToken = debtToken_;
@@ -218,6 +225,9 @@ contract LendingPool is
         return collateralValue / (debtValue / WAD);
     }
 }
+<<<<<<< HEAD:contracts/core/LendingPool.sol
 
 
 
+=======
+>>>>>>> 59d5972 (test(vault): add YieldVaultV2 upgrade tests, fix V2 constructor):aralys-finance/contracts/core/LendingPool.sol
