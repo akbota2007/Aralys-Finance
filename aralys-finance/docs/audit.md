@@ -99,7 +99,7 @@ This document is the internal team-authored audit of Aralys Finance. The audit w
 
 The protocol successfully passes 80 tests, meeting the strict criteria for Unit, Fuzz, Fork, and Invariant coverage.
 
-![Foundry Test Output](images/YOUR_TEST_SCREENSHOT_NAME.png)
+![Foundry Test Output](foundry-test.png)
 *Fig 1: Foundry test suite showing 80 passing tests, including stateful invariants.*
 
 ---
