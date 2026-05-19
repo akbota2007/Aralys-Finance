@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aralys Finance</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #7c6aff;
+    --accent2: #00e5a0;
+    --accent3: #ff6b6b;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --card: #13131f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 20% 20%, rgba(124,106,255,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0,229,160,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+    border: none;
+    background: none;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    color: var(--text);
+    background: var(--border);
+  }
+
+  .nav-link.active {
+    color: var(--accent);
+  }
+
+  .connect-btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #9b59ff);
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .connect-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(124,106,255,0.4);
+  }
+
+  .connect-btn.connected {
+    background: var(--border);
+    color: var(--accent2);
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .page { display: none; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* DASHBOARD */
+  .hero {
+    text-align: center;
+    padding: 3rem 0 2rem;
+  }
+
+  .hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .stat-card:hover::before { opacity: 1; }
+
+  .stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat-sub {
+    font-size: 0.8rem;
+    color: var(--accent2);
+    margin-top: 0.25rem;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .badge-green { background: rgba(0,229,160,0.15); color: var(--accent2); }
+  .badge-purple { background: rgba(124,106,255,0.15); color: var(--accent); }
+  .badge-red { background: rgba(255,107,107,0.15); color: var(--accent3); }
+
+  /* FORM */
+  .input-group {
+    margin-bottom: 1rem;
+  }
+
+  .input-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  .input-wrapper input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: 'Space Mono', monospace;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-wrapper input:focus {
+    border-color: var(--accent);
+  }
+
+  .input-tag {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+    margin-top: 0.5rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #9b59ff);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(124,106,255,0.4);
+  }
+
+  .btn-secondary {
+    background: var(--border);
+    color: var(--text);
+  }
+
+  .btn-secondary:hover { background: #252535; }
+
+  .btn-success {
+    background: linear-gradient(135deg, #00c37a, var(--accent2));
+    color: #000;
+  }
+
+  .btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,229,160,0.3);
+  }
+
+  /* TWO COL */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 2.5rem; }
+  }
+
+  /* POSITION INFO */
+  .position-info {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .position-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    font-size: 0.9rem;
+  }
+
+  .position-row:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .position-key { color: var(--muted); }
+  .position-val {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+  }
+
+  /* PROPOSALS */
+  .proposal-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+  }
+
+  .proposal-card:hover { border-color: var(--accent); }
+
+  .proposal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .proposal-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .proposal-meta {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .vote-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 100px;
+    margin: 0.75rem 0;
+    overflow: hidden;
+  }
+
+  .vote-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 100px;
+    transition: width 1s ease;
+  }
+
+  .vote-counts {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .vote-for { color: var(--accent2); }
+  .vote-against { color: var(--accent3); }
+
+  .proposal-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .proposal-actions .btn {
+    margin: 0;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    z-index: 1000;
+    font-size: 0.9rem;
+    display: none;
+    animation: slideUp 0.3s ease;
+    max-width: 320px;
+  }
+
+  .toast.show { display: block; }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .network-warning {
+    background: rgba(255,107,107,0.1);
+    border: 1px solid rgba(255,107,107,0.3);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .network-warning .warn-icon { font-size: 1.5rem; }
+  .network-warning strong { color: var(--accent3); }
+
+  .switch-btn {
+    margin-left: auto;
+    padding: 0.4rem 1rem;
+    background: var(--accent3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .hf-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .hf-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">⬡ Aralys Finance</div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('dashboard', this)">Dashboard</button>
+    <button class="nav-link" onclick="showPage('swap', this)">Swap</button>
+    <button class="nav-link" onclick="showPage('vault', this)">Vault</button>
+    <button class="nav-link" onclick="showPage('lending', this)">Lend</button>
+    <button class="nav-link" onclick="showPage('governance', this)">Govern</button>
+  </div>
+  <button class="connect-btn" id="connectBtn" onclick="toggleConnect()">Connect Wallet</button>
+</nav>
+
+<main>
+
+  <!-- NETWORK WARNING -->
+  <div class="network-warning" id="networkWarning" style="display:none">
+    <span class="warn-icon">⚠️</span>
+    <div>
+      <strong>Wrong Network</strong><br>
+      Please switch to <strong>Arbitrum Sepolia</strong> to use Aralys Finance.
+    </div>
+    <button class="switch-btn" onclick="switchNetwork()">Switch Network</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="dashboard">
+    <div class="hero">
+      <h1>DeFi<br>Supercharged</h1>
+      <p>Swap, earn, and borrow on Arbitrum — governed by the community.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">TVL</div>
+        <div class="stat-value" id="tvl">$0.00</div>
+        <div class="stat-sub">↑ Protocol total value locked</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">ARLY Balance</div>
+        <div class="stat-value" id="arlyBalance">0.00</div>
+        <div class="stat-sub">Your governance tokens</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Voting Power</div>
+        <div class="stat-value" id="votingPower">0.00</div>
+        <div class="stat-sub">Delegated to <span id="delegateTo">—</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pool Reserves</div>
+        <div class="stat-value" id="poolReserves">—</div>
+        <div class="stat-sub">USDC / ETH pair</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">🏊 AMM Pool <span class="badge badge-green">0.3% fee</span></div>
+        <div class="position-info">
+          <div class="position-row">
+            <span class="position-key">Reserve 0 (USDC)</span>
+            <span class="position-val" id="res0">1,000,000</span>
+          </div>
+          <div class="position-row">
+            <span class="position-key">Reserve 1 (ETH)</span>
+            <span class="position-val" id="res1">500</span>
+          </div>
+          <div class="position-row">
+            <span class="position-key">k = x·y</span>
+            <span class="position-val">500,000,000</span>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="showPage('swap', document.querySelectorAll('.nav-link')[1])">Trade Now →</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🏦 Your Position <span class="badge badge-purple">Lending</span></div>
+        <div class="position-info">
+          <div class="position-row">
+            <span class="position-key">Collateral</span>
+            <span class="position-val" id="posCollateral">0.00 LP</span>
+          </div>
+          <div class="position-row">
+            <span class="position-key">Debt</span>
+            <span class="position-val" id="posDebt">0.00 USDC</span>
+          </div>
+          <div class="position-row">
+            <span class="position-key">Health Factor</span>
+            <span class="position-val">
+              <span class="hf-indicator">
+                <span class="hf-dot" id="hfDot" style="background:#00e5a0"></span>
+                <span id="hfValue">—</span>
+              </span>
+            </span>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="showPage('lending', document.querySelectorAll('.nav-link')[3])">Manage →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SWAP -->
+  <div class="page" id="swap">
+    <div class="card" style="max-width:480px;margin:2rem auto">
+      <div class="card-title">⚡ Swap <span class="badge badge-green">x·y=k</span></div>
+      <div class="input-group">
+        <label class="input-label">You Pay</label>
+        <div class="input-wrapper">
+          <input type="number" id="swapIn" placeholder="0.0" oninput="calcSwapOut()">
+          <span class="input-tag">USDC</span>
+        </div>
+      </div>
+      <div style="text-align:center;color:var(--muted);margin:0.5rem 0;cursor:pointer" onclick="flipSwap()">⇅</div>
+      <div class="input-group">
+        <label class="input-label">You Receive</label>
+        <div class="input-wrapper">
+          <input type="number" id="swapOut" placeholder="0.0" readonly style="opacity:0.7">
+          <span class="input-tag">ETH</span>
+        </div>
+      </div>
+      <div class="position-info" style="margin-bottom:1rem">
+        <div class="position-row">
+          <span class="position-key">Rate</span>
+          <span class="position-val" id="swapRate">1 USDC = 0.0005 ETH</span>
+        </div>
+        <div class="position-row">
+          <span class="position-key">Fee (0.3%)</span>
+          <span class="position-val" id="swapFee">0.00 USDC</span>
+        </div>
+        <div class="position-row">
+          <span class="position-key">Slippage</span>
+          <span class="position-val">0.5%</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="executeSwap()">Swap →</button>
+    </div>
+  </div>
+
+  <!-- VAULT -->
+  <div class="page" id="vault">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">🏛 Yield Vault <span class="badge badge-purple">ERC-4626</span></div>
+        <div class="position-info" style="margin-bottom:1rem">
+          <div class="position-row">
+            <span class="position-key">Your Shares</span>
+            <span class="position-val" id="vaultShares">0.00 yARLY</span>
+          </div>
+          <div class="position-row">
+            <span class="position-key">Underlying Value</span>
+            <span class="position-val" id="vaultValue">0.00 LP</span>
+          </div>
+          <div class="position-row">
+            <span class="position-key">APY (est.)</span>
+            <span class="position-val" style="color:var(--accent2)">12.4%</span>
+          </div>
+          <div class="position-row">
+            <span class="position-key">Performance Fee</span>
+            <span class="position-val">10%</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Deposit LP Tokens</label>
+          <div class="input-wrapper">
+            <input type="number" id="depositAmt" placeholder="0.0">
+            <span class="input-tag">LP</span>
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="executeDeposit()">Deposit →</button>
+      </div>
+      <div class="card">
+        <div class="card-title">💸 Withdraw</div>
+        <div class="input-group">
+          <label class="input-label">Redeem Shares</label>
+          <div class="input-wrapper">
+            <input type="number" id="withdrawAmt" placeholder="0.0">
+            <span class="input-tag">yARLY</span>
+          </div>
+        </div>
+        <div class="position-info" style="margin:1rem 0">
+          <div class="position-row">
+            <span class="position-key">Preview LP Out</span>
+            <span class="position-val">0.00 LP</span>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="executeWithdraw()">Withdraw →</button>
+        <div style="margin-top:1rem;padding:1rem;background:rgba(124,106,255,0.08);border-radius:10px;font-size:0.82rem;color:var(--muted)">
+          <strong style="color:var(--accent)">V2 Upgrade:</strong> YieldVaultV2 adds harvestFee() and version() — demonstrates UUPS upgrade path via governance.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LENDING -->
+  <div class="page" id="lending">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">🔒 Collateral <span class="badge badge-purple">75% LTV</span></div>
+        <div class="position-info" style="margin-bottom:1rem">
+          <div class="position-row">
+            <span class="position-key">Deposited</span>
+            <span class="position-val" id="lendCollateral">0.00 LP</span>
+          </div>
+          <div class="position-row">
+            <span class="position-key">Max Borrow</span>
+            <span class="position-val" id="maxBorrow">0.00 USDC</span>
+          </div>
+          <div class="position-row">
+            <span class="position-key">Health Factor</span>
+            <span class="position-val">
+              <span class="hf-indicator">
+                <span class="hf-dot" style="background:#00e5a0"></span>
+                <span id="lendHF">Safe</span>
+              </span>
+            </span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Deposit Collateral</label>
+          <div class="input-wrapper">
+            <input type="number" id="collateralAmt" placeholder="0.0" oninput="calcMaxBorrow()">
+            <span class="input-tag">LP</span>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="executeCollateral()">Deposit Collateral →</button>
+      </div>
+      <div class="card">
+        <div class="card-title">💰 Borrow <span class="badge badge-red">5% APR</span></div>
+        <div class="input-group">
+          <label class="input-label">Borrow Amount</label>
+          <div class="input-wrapper">
+            <input type="number" id="borrowAmt" placeholder="0.0">
+            <span class="input-tag">USDC</span>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-bottom:1rem" onclick="executeBorrow()">Borrow →</button>
+
+        <div class="card-title" style="margin-top:1rem">Repay</div>
+        <div class="input-group">
+          <label class="input-label">Repay Amount</label>
+          <div class="input-wrapper">
+            <input type="number" id="repayAmt" placeholder="0.0">
+            <span class="input-tag">USDC</span>
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="executeRepay()">Repay →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOVERNANCE -->
+  <div class="page" id="governance">
+    <div class="card">
+      <div class="card-title">🗳 Active Proposals <span class="badge badge-purple">The Graph</span></div>
+      <div id="proposalsList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Your Voting Stats</div>
+      <div class="position-info">
+        <div class="position-row">
+          <span class="position-key">ARLY Balance</span>
+          <span class="position-val" id="govBalance">0.00 ARLY</span>
+        </div>
+        <div class="position-row">
+          <span class="position-key">Voting Power</span>
+          <span class="position-val" id="govPower">0.00</span>
+        </div>
+        <div class="position-row">
+          <span class="position-key">Delegate</span>
+          <span class="position-val" id="govDelegate" style="font-size:0.75rem">Not set</span>
+        </div>
+        <div class="position-row">
+          <span class="position-key">Quorum Required</span>
+          <span class="position-val">4% of supply</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:1rem" onclick="selfDelegate()">Self-Delegate Votes →</button>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let connected = false;
+let address = '';
+
+const PROPOSALS = [
+  {
+    id: '1',
+    title: 'Update AMM fee to 0.25%',
+    description: 'Proposal to reduce swap fees to increase volume',
+    state: 'Active',
+    forVotes: 420000,
+    againstVotes: 80000,
+    endBlock: 'May 25, 2026'
+  },
+  {
+    id: '2',
+    title: 'Upgrade YieldVault to V2',
+    description: 'Deploy YieldVaultV2 with harvestFee() via UUPS proxy',
+    state: 'Succeeded',
+    forVotes: 650000,
+    againstVotes: 12000,
+    endBlock: 'May 15, 2026'
+  },
+  {
+    id: '3',
+    title: 'Add ETH/USDC lending market',
+    description: 'Enable ETH as second collateral type in LendingPool V2',
+    state: 'Pending',
+    forVotes: 0,
+    againstVotes: 0,
+    endBlock: 'May 30, 2026'
+  }
+];
+
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'governance') renderProposals();
+}
+
+function renderProposals() {
+  const list = document.getElementById('proposalsList');
+  list.innerHTML = PROPOSALS.map(p => {
+    const total = p.forVotes + p.againstVotes;
+    const pct = total > 0 ? Math.round(p.forVotes / total * 100) : 0;
+    const stateColor = p.state === 'Active' ? 'badge-green' : p.state === 'Succeeded' ? 'badge-purple' : 'badge-red';
+    return `
+      <div class="proposal-card">
+        <div class="proposal-header">
+          <div>
+            <div class="proposal-title">${p.title}</div>
+            <div class="proposal-meta">#${p.id} · Ends ${p.endBlock}</div>
+          </div>
+          <span class="badge ${stateColor}">${p.state}</span>
+        </div>
+        <div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.75rem">${p.description}</div>
+        <div class="vote-bar"><div class="vote-fill" style="width:${pct}%"></div></div>
+        <div class="vote-counts">
+          <span class="vote-for">✓ For: ${p.forVotes.toLocaleString()} ARLY</span>
+          <span class="vote-against">✗ Against: ${p.againstVotes.toLocaleString()} ARLY</span>
+        </div>
+        ${p.state === 'Active' ? `
+        <div class="proposal-actions">
+          <button class="btn btn-success" onclick="castVote('${p.id}', 1)">Vote For</button>
+          <button class="btn btn-secondary" onclick="castVote('${p.id}', 0)">Vote Against</button>
+          <button class="btn btn-secondary" onclick="castVote('${p.id}', 2)">Abstain</button>
+        </div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+async function toggleConnect() {
+  if (connected) {
+    connected = false;
+    address = '';
+    document.getElementById('connectBtn').textContent = 'Connect Wallet';
+    document.getElementById('connectBtn').classList.remove('connected');
+    resetStats();
+    return;
+  }
+
+  if (typeof window.ethereum === 'undefined') {
+    showToast('🦊 MetaMask not detected. Please install MetaMask.');
+    return;
+  }
+
+  try {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    address = accounts[0];
+    connected = true;
+    const short = address.slice(0,6) + '...' + address.slice(-4);
+    document.getElementById('connectBtn').textContent = short;
+    document.getElementById('connectBtn').classList.add('connected');
+
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    if (chainId !== '0x66eee') {
+      document.getElementById('networkWarning').style.display = 'flex';
+    } else {
+      document.getElementById('networkWarning').style.display = 'none';
+    }
+
+    loadMockData();
+    showToast('✅ Wallet connected: ' + short);
+  } catch (e) {
+    if (e.code === 4001) {
+      showToast('❌ Connection rejected by user.');
+    } else {
+      showToast('❌ Error: ' + e.message);
+    }
+  }
+}
+
+function loadMockData() {
+  document.getElementById('tvl').textContent = '$2,847,392';
+  document.getElementById('arlyBalance').textContent = '10,000';
+  document.getElementById('votingPower').textContent = '10,000';
+  document.getElementById('delegateTo').textContent = 'self';
+  document.getElementById('poolReserves').textContent = '1M/500';
+  document.getElementById('govBalance').textContent = '10,000 ARLY';
+  document.getElementById('govPower').textContent = '10,000';
+  document.getElementById('govDelegate').textContent = address.slice(0,6) + '...' + address.slice(-4);
+}
+
+function resetStats() {
+  ['tvl','arlyBalance','votingPower','poolReserves'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = id === 'poolReserves' ? '—' : '0.00';
+  });
+}
+
+function calcSwapOut() {
+  const amtIn = parseFloat(document.getElementById('swapIn').value) || 0;
+  const r0 = 1000000, r1 = 500;
+  const fee = amtIn * 0.003;
+  const amtInWithFee = amtIn - fee;
+  const amtOut = (r1 * amtInWithFee) / (r0 + amtInWithFee);
+  document.getElementById('swapOut').value = amtOut.toFixed(6);
+  document.getElementById('swapFee').textContent = fee.toFixed(4) + ' USDC';
+}
+
+function flipSwap() {
+  showToast('↕ Token order flipped');
+}
+
+function calcMaxBorrow() {
+  const col = parseFloat(document.getElementById('collateralAmt').value) || 0;
+  const price = 2000;
+  const max = col * price * 0.75;
+  document.getElementById('maxBorrow').textContent = max.toFixed(2) + ' USDC';
+  document.getElementById('lendCollateral').textContent = col.toFixed(2) + ' LP';
+}
+
+function executeSwap() {
+  if (!connected) { showToast('⚠️ Please connect your wallet first.'); return; }
+  const amt = document.getElementById('swapIn').value;
+  if (!amt || amt <= 0) { showToast('⚠️ Enter a valid amount.'); return; }
+  simulateTx('Swap ' + amt + ' USDC → ETH');
+}
+
+function executeDeposit() {
+  if (!connected) { showToast('⚠️ Please connect your wallet first.'); return; }
+  const amt = document.getElementById('depositAmt').value;
+  if (!amt || amt <= 0) { showToast('⚠️ Enter a valid amount.'); return; }
+  document.getElementById('vaultShares').textContent = (parseFloat(amt) * 0.98).toFixed(2) + ' yARLY';
+  document.getElementById('vaultValue').textContent = amt + ' LP';
+  simulateTx('Deposit ' + amt + ' LP into YieldVault');
+}
+
+function executeWithdraw() {
+  if (!connected) { showToast('⚠️ Please connect your wallet first.'); return; }
+  simulateTx('Withdraw from YieldVault');
+}
+
+function executeCollateral() {
+  if (!connected) { showToast('⚠️ Please connect your wallet first.'); return; }
+  const amt = document.getElementById('collateralAmt').value;
+  if (!amt || amt <= 0) { showToast('⚠️ Enter a valid amount.'); return; }
+  simulateTx('Deposit ' + amt + ' LP as collateral');
+}
+
+function executeBorrow() {
+  if (!connected) { showToast('⚠️ Please connect your wallet first.'); return; }
+  const amt = document.getElementById('borrowAmt').value;
+  if (!amt || amt <= 0) { showToast('⚠️ Enter a valid amount.'); return; }
+  simulateTx('Borrow ' + amt + ' USDC');
+}
+
+function executeRepay() {
+  if (!connected) { showToast('⚠️ Please connect your wallet first.'); return; }
+  const amt = document.getElementById('repayAmt').value;
+  if (!amt || amt <= 0) { showToast('⚠️ Enter a valid amount.'); return; }
+  simulateTx('Repay ' + amt + ' USDC');
+}
+
+function castVote(proposalId, support) {
+  if (!connected) { showToast('⚠️ Please connect your wallet first.'); return; }
+  const labels = ['Against', 'For', 'Abstain'];
+  simulateTx('Vote ' + labels[support] + ' on Proposal #' + proposalId);
+}
+
+function selfDelegate() {
+  if (!connected) { showToast('⚠️ Please connect your wallet first.'); return; }
+  simulateTx('Self-delegate ARLY voting power');
+}
+
+function switchNetwork() {
+  if (typeof window.ethereum === 'undefined') {
+    showToast('🦊 MetaMask not found.');
+    return;
+  }
+  window.ethereum.request({
+    method: 'wallet_addEthereumChain',
+    params: [{
+      chainId: '0x66eee',
+      chainName: 'Arbitrum Sepolia',
+      nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+      rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc'],
+      blockExplorerUrls: ['https://sepolia.arbiscan.io']
+    }]
+  }).then(() => {
+    document.getElementById('networkWarning').style.display = 'none';
+    showToast('✅ Switched to Arbitrum Sepolia!');
+  }).catch(e => showToast('❌ ' + e.message));
+}
+
+function simulateTx(action) {
+  showToast('⏳ ' + action + '...');
+  setTimeout(() => {
+    showToast('✅ ' + action + ' confirmed!');
+  }, 1500);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+renderProposals();
+</script>
+</body>
+</html>
