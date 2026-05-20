@@ -2,8 +2,7 @@
 pragma solidity 0.8.24;
 
 import { OwnableUpgradeable } from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from
-    "../libraries/ReentrancyGuardUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "../libraries/ReentrancyGuardUpgradeable.sol";
 import { PausableUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/PausableUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -77,7 +76,6 @@ contract LendingPool is
         __Ownable_init(owner_);
         __ReentrancyGuard_init();
         __Pausable_init();
-        
 
         collateralToken = collateralToken_;
         debtToken = debtToken_;
@@ -218,6 +216,3 @@ contract LendingPool is
         return collateralValue / (debtValue / WAD);
     }
 }
-
-
-

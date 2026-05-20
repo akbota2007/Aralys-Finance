@@ -1,4 +1,30 @@
 {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:foundry.lock
+  "lib\\chainlink": {
+    "tag": {
+      "name": "v2.46.0",
+      "rev": "e275ecd410e4911dab753cd105c1d2046d8f84fc"
+    }
+  },
+  "lib\\chainlink-brownie-contracts": {
+    "tag": {
+      "name": "1.3.0",
+      "rev": "5cb41fbc9b525338b6098da5ea7dd0b7e92f89e4"
+    }
+=======
+  "../lib/forge-std": {
+    "rev": "620536fa5277db4e3fd46772d5cbc1ea0696fb43"
+  },
+  "../lib/openzeppelin-contracts": {
+    "rev": "5fd1781b1454fd1ef8e722282f86f9293cacf256"
+  },
+  "../lib/openzeppelin-contracts-upgradeable": {
+    "rev": "7bf4727aacdbfaa0f36cbd664654d0c9e1dc52bf"
+>>>>>>> 59d5972 (test(vault): add YieldVaultV2 upgrade tests, fix V2 constructor):aralys-finance/foundry.lock
+  },
+>>>>>>> 60b968b033450e5d072845081935306bf4c9237e
   "lib\\forge-std": {
     "tag": {
       "name": "v1.16.1",

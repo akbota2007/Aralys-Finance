@@ -4,8 +4,7 @@ pragma solidity 0.8.24;
 import { ERC4626Upgradeable } from
     "@openzeppelin-upgradeable/contracts/token/ERC20/extensions/ERC4626Upgradeable.sol";
 import { OwnableUpgradeable } from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from
-    "../libraries/ReentrancyGuardUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "../libraries/ReentrancyGuardUpgradeable.sol";
 import { PausableUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/PausableUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
@@ -71,7 +70,6 @@ contract YieldVault is
         __Ownable_init(owner_);
         __ReentrancyGuard_init();
         __Pausable_init();
-        
 
         VaultStorage storage $ = _getVaultStorage();
         $.feeRecipient = feeRecipient_;
