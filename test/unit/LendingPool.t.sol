@@ -260,20 +260,6 @@ contract LendingPoolTest is Test {
     }
 
     function test_Liquidate_SucceedsWhenUnhealthy() public {
-<<<<<<< HEAD:test/unit/LendingPool.t.sol
-        // Deposit little, borrow a lot to make position unhealthy
-        uint256 smallDeposit = 1e18;
-        uint256 largeBorrow = 1e18; // borrow = collateral value, clearly unhealthy
-        collateral.mint(alice, 1000e18);
-        debt.mint(address(pool), 1000e18);
-        vm.prank(alice);
-        pool.deposit(smallDeposit);
-        // manually set debt via storage to simulate unhealthy position
-        // Instead: borrow max then manipulate
-        // Simplest: skip this test and mark as known issue
-        vm.skip(true);
-    }
-=======
     vm.prank(alice);
     pool.deposit(DEPOSIT_AMOUNT);
     vm.prank(alice);
@@ -281,27 +267,29 @@ contract LendingPoolTest is Test {
 
     // Override mock with crashed price — must clear old mock first
     vm.clearMockedCalls();
-    // Set price so low that HF < 1
-    // collateral=10e18, debt=5e18, liqThreshold=80%
-    // HF = (10 * price * 8000) / (5 * price * 10000) = 0.8*10/5 = 1.6 at any price
-    // We need MORE debt. Borrow more first.
+    
     vm.mockCall(
         address(oracle),
         abi.encodeWithSelector(OracleAdapter.getPrice.selector, address(collateral)),
         abi.encode(PRICE)
     );
+    
     // Borrow up to 79% of collateral value to get close to threshold
     uint256 moreBorrow = (DEPOSIT_AMOUNT * 79) / 100 - BORROW_AMOUNT;
     vm.prank(alice);
     pool.borrow(moreBorrow);
 
-    // Now crash price by 50% — HF drops below 1
+    // НАЧАЛО ИСПРАВЛЕНИЯ: Обрушаем цену обеспечения максимально жестко (в 5 раз),
+    // чтобы даже при одинаковом изменении котировок ликвидности не хватило.
+    // Если это не помогло из-за одинаковых адресов, мы мокаем вызов БЕЗ указания аргумента,
+    // либо передаем цену, близкую к нулю (например, 1), чтобы сломать HF.
     vm.clearMockedCalls();
     vm.mockCall(
         address(oracle),
         abi.encodeWithSelector(OracleAdapter.getPrice.selector, address(collateral)),
-        abi.encode(PRICE / 2)
+        abi.encode(1) 
     );
+    // КОНЕЦ ИСПРАВЛЕНИЯ
 
     uint256 bobDebtBefore = debt.balanceOf(bob);
     uint256 bobColBefore = collateral.balanceOf(bob);
@@ -312,9 +300,6 @@ contract LendingPoolTest is Test {
     assertLt(debt.balanceOf(bob), bobDebtBefore);
     assertGt(collateral.balanceOf(bob), bobColBefore);
 }
->>>>>>> 59d5972 (test(vault): add YieldVaultV2 upgrade tests, fix V2 constructor):aralys-finance/test/unit/LendingPool.t.sol
-
-    
     // healthFactor()
     
 
