@@ -1,0 +1,8 @@
+== Logs ==
+  OK: timelock delay 172800
+  OK: deployer not admin
+  OK: governor settings match
+  OK: factory owner is timelock
+  OK: vault owner is timelock
+  OK: lending pool owner is timelock
+  OK: protocol safely decentralized
