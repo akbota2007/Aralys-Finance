@@ -2,7 +2,7 @@
 
 **A modular DeFi super-app: AMM + Lending + Tokenized Yield Vault, governed on-chain, deployed on Arbitrum Sepolia.**
 
-> Capstone project — Blockchain Technologies 2 (BChT2). Team of 3.
+> Final project — Blockchain Technologies 2 (BChT2). Team of 3.
 > Scenario: **Option A — DeFi Super-App**.
 
 ---
@@ -52,9 +52,9 @@ aralys-finance/
 ├── frontend/          # React + Wagmi + Viem dApp
 ├── subgraph/          # The Graph manifest, schema, mappings
 ├── docs/
-│   ├── architecture.md      # ≥6 pages
-│   ├── audit.md             # ≥8 pages
-│   ├── gas-report.md        # before/after benchmarks
+│   ├── architecture.md      
+│   ├── audit.md             
+│   ├── gas-report.md       
 │   ├── coverage.md          # forge coverage output
 │   └── diagrams/            # C4, sequence diagrams (PNG/SVG)
 └── .github/workflows/ # CI: build, test, coverage, slither
@@ -109,15 +109,15 @@ pnpm deploy  # to Graph Studio
 
 ## Deployed addresses (Arbitrum Sepolia)
 
-| Contract            | Address                      | Verified |
-| ------------------- | ---------------------------- | -------- |
-| ARLY token          | `0x...`                      | ✅       |
-| Timelock            | `0x...`                      | ✅       |
-| Governor            | `0x...`                      | ✅       |
-| AMM Factory         | `0x...`                      | ✅       |
-| Yield Vault         | `0x...`                      | ✅       |
-| Lending Pool        | `0x...`                      | ✅       |
-| Chainlink Adapter   | `0x...`                      | ✅       |
+| Contract            | Address                                      | Verified |
+| ------------------- | -------------------------------------------- | -------- |
+| ARLY token          | `0x51E523A3De774028C5df2a92a08906963BB232DE` | ✅       |
+| Timelock            | `0xbD2B44F698fB47648fB07f43399b24ba665328Bf` | ✅       |
+| Governor            | `0x3446D07d6d9c6D80EDcbAE7F0e3D65bDF2473456` | ✅       |
+| AMM Factory         | `0x0EbC1580A77519B91564f20815B17f2A309D5b38` | ✅       |
+| Yield Vault         | `0x1928CDe07f493cfA502c3325608b6E99fB45eD44` | ✅       |
+| Lending Pool        | `0xbBa1F670494dfB5C43DE40a76a5e01b333469145` | ✅       |
+| Chainlink Adapter   | `0xB5cDF2e85e1b9bDe031666eA4A2ED42F02082260` | ✅       |
 
 > Subgraph: `https://api.studio.thegraph.com/query/<id>/aralys-finance/v0.1.0`
 
